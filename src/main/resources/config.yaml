@@ -1,0 +1,27 @@
+connectionConfig:
+  connectionString: "jdbc:mysql://localhost/test?user=can&password=password"
+  tableFetchQuery: "SELECT * FROM %s WHERE 1 = 0"
+
+dbToEntityMapperConfig:
+  catalog: "test"
+  tablesToIgnore: [
+      "sys_config"
+  ]
+  preferredImports: {
+    "Date": "java.util.Date",
+    "Timestamp": "java.util.Date",
+    "Time": "java.util.Date",
+    "BigDecimal": "java.lang.Long"
+  }
+
+entityClassGeneratorConfig:
+  packagePath: "com.can.entity"
+  generatedValueStrategy: "GenerationType.IDENTITY"
+  addNotNullable: true
+  useLombok: true
+  generateGettersSetters: false
+
+generatedClassWriterConfig:
+  deleteBeforeStart: true
+  outputDir: "out/"
+
