@@ -62,7 +62,6 @@
             <artifactId>mssql-jdbc</artifactId>
             <version>10.2.0.jre11</version>
         </dependency>
-
     </dependencies>
 
     <build>

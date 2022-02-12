@@ -19,6 +19,7 @@ public class ConfigFileOperations implements IConfigFileOperations {
             configurations = mapper.readValue(new File(defaultConfigPath), Configurations.class);
         }
         catch (IOException | NullPointerException e) {
+            e.printStackTrace();
             return null;
         }
         return configurations;

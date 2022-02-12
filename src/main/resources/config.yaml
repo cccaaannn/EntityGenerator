@@ -21,7 +21,9 @@ entityClassGeneratorConfig:
   useLombok: true
   generateGettersSetters: false
 
+repositoryClassGeneratorConfig:
+  packagePath: "com.can.repository"
+
 generatedClassWriterConfig:
   deleteBeforeStart: true
   outputDir: "out/"
-
