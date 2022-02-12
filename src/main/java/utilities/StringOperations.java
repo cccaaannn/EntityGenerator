@@ -1,5 +1,6 @@
 package utilities;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.CaseUtils;
 
 public class StringOperations {
@@ -27,6 +28,11 @@ public class StringOperations {
 
     public static String toCamelCase(String strToCaseSwap) {
         return CaseUtils.toCamelCase(strToCaseSwap, false, ' ', '_');
+    }
+
+    public static String toCapitalCamelCase(String strToCaseSwap) {
+        String camelCase = StringOperations.toCamelCase(strToCaseSwap);
+        return StringUtils.capitalize(camelCase);
     }
 
 }

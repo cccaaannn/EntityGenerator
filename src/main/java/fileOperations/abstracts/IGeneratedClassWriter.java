@@ -1,12 +1,11 @@
 package fileOperations.abstracts;
 
 import entities.generatedClasses.GeneratedClass;
-
-import java.util.List;
+import entities.generatedClasses.GeneratedClassGroup;
 
 public interface IGeneratedClassWriter {
-    void writeToFile(List<GeneratedClass> generatedClasses);
-    void writeToFile(GeneratedClass generatedClass);
-    void writeToConsole(List<GeneratedClass> generatedClasses);
+    void writeToFile(GeneratedClassGroup generatedClassGroup);
+    void writeToFile(GeneratedClass generatedClass, String containingFolderName);
+    void writeToConsole(GeneratedClassGroup generatedClassGroup);
     void writeToConsole(GeneratedClass generatedClasses);
 }

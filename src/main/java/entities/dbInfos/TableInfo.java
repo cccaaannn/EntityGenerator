@@ -14,10 +14,19 @@ public class TableInfo {
     private Set<JavaDataType> javaDataTypes;
 
     /*
-     * nameJava is camel case
+     * nameJava is camel case with capital first character
      */
     public void setNameJava(String nameJava) {
-        this.nameJava = StringOperations.toCamelCase(nameJava);
+        this.nameJava = StringOperations.toCapitalCamelCase(nameJava);
+    }
+
+    public ColumnInfo getPrimaryKeyColumn() {
+        for (ColumnInfo columnInfo: columnInfos) {
+            if(columnInfo.getIsPrimary()) {
+                return columnInfo;
+            }
+        }
+        return null;
     }
 
 }

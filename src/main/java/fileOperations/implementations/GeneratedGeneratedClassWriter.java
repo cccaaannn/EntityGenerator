@@ -2,6 +2,7 @@ package fileOperations.implementations;
 
 import entities.configurations.GeneratedClassWriterConfig;
 import entities.generatedClasses.GeneratedClass;
+import entities.generatedClasses.GeneratedClassGroup;
 import fileOperations.abstracts.IGeneratedClassWriter;
 import org.apache.commons.io.FileUtils;
 
@@ -9,7 +10,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
 
 public class GeneratedGeneratedClassWriter implements IGeneratedClassWriter {
 
@@ -20,21 +20,21 @@ public class GeneratedGeneratedClassWriter implements IGeneratedClassWriter {
     }
 
     @Override
-    public void writeToFile(List<GeneratedClass> generatedClasses) {
+    public void writeToFile(GeneratedClassGroup generatedClassGroup) {
         if(generatedClassWriterConfig.getDeleteBeforeStart()) {
-            this.deleteSaveDir();
+            this.deleteDirIfNotExists(generatedClassGroup.getContainingFolderName());
         }
-        for (GeneratedClass generatedClass: generatedClasses) {
-            writeToFile(generatedClass);
+        for (GeneratedClass generatedClass: generatedClassGroup.getGeneratedClasses()) {
+            writeToFile(generatedClass, generatedClassGroup.getContainingFolderName());
         }
     }
 
     @Override
-    public void writeToFile(GeneratedClass generatedClass){
+    public void writeToFile(GeneratedClass generatedClass, String containingFolderName){
 
-        this.createDirsIfNotExists();
+        this.createDirsIfNotExists(containingFolderName);
 
-        File file = new File(this.generatedClassWriterConfig.getOutputDir() + "/" + generatedClass.getFileName());
+        File file = new File(this.generatedClassWriterConfig.getOutputDir() + "/" + containingFolderName + "/" + generatedClass.getFileName());
         try{
             FileWriter fw = new FileWriter(file.getAbsoluteFile());
             BufferedWriter bw = new BufferedWriter(fw);
@@ -48,8 +48,8 @@ public class GeneratedGeneratedClassWriter implements IGeneratedClassWriter {
 
 
     @Override
-    public void writeToConsole(List<GeneratedClass> generatedClasses) {
-        for (GeneratedClass generatedClass: generatedClasses) {
+    public void writeToConsole(GeneratedClassGroup generatedClassGroup) {
+        for (GeneratedClass generatedClass: generatedClassGroup.getGeneratedClasses()) {
             writeToConsole(generatedClass);
         }
     }
@@ -61,18 +61,21 @@ public class GeneratedGeneratedClassWriter implements IGeneratedClassWriter {
         System.out.println("---------- ---------- ---------- ---------- ----------\n");
     }
 
-    private void deleteSaveDir() {
-        try {
-            FileUtils.deleteDirectory(new File(generatedClassWriterConfig.getOutputDir()));
-        } catch (IOException e) {
-            // e.printStackTrace();
+    private void createDirsIfNotExists(String containingFolderName) {
+        File directory = new File(this.generatedClassWriterConfig.getOutputDir() + "/" + containingFolderName);
+        if (!directory.exists()){
+            directory.mkdirs();
         }
     }
 
-    private void createDirsIfNotExists() {
-        File directory = new File(this.generatedClassWriterConfig.getOutputDir());
-        if (!directory.exists()){
-            directory.mkdirs();
+    private void deleteDirIfNotExists(String containingFolderName) {
+        File directory = new File(this.generatedClassWriterConfig.getOutputDir() + "/" + containingFolderName);
+        if (directory.exists()){
+            try {
+                FileUtils.deleteDirectory(new File(generatedClassWriterConfig.getOutputDir()));
+            } catch (IOException e) {
+                // e.printStackTrace();
+            }
         }
     }
 

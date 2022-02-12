@@ -6,7 +6,9 @@ import entities.dbInfos.DbInfo;
 import entities.dbInfos.TableInfo;
 import entities.configurations.EntityClassGeneratorConfig;
 import entities.generatedClasses.GeneratedClass;
+import entities.generatedClasses.GeneratedClassGroup;
 import generators.abstracts.IEntityClassGenerator;
+import utilities.StringOperations;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +22,8 @@ public class EntityClassGenerator implements IEntityClassGenerator {
     }
 
     @Override
-    public List<GeneratedClass> generateJavaEntityClasses(DbInfo dbInfo) {
+    public GeneratedClassGroup generateJavaEntityClasses(DbInfo dbInfo) {
+        GeneratedClassGroup generatedClassGroup = new GeneratedClassGroup();
         List<GeneratedClass> generatedEntities = new ArrayList<>();
 
         for (TableInfo tableInfo: dbInfo.getTableInfos()) {
@@ -28,7 +31,11 @@ public class EntityClassGenerator implements IEntityClassGenerator {
             generatedEntities.add(generatedEntity);
         }
 
-        return generatedEntities;
+        generatedClassGroup.setPackageName(entityClassGeneratorConfig.getPackagePath());
+        generatedClassGroup.setContainingFolderName(StringOperations.getNameFromImport(entityClassGeneratorConfig.getPackagePath()));
+        generatedClassGroup.setGeneratedClasses(generatedEntities);
+
+        return generatedClassGroup;
     }
 
 
