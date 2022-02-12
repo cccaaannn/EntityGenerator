@@ -5,9 +5,11 @@ import entities.configurations.Configurations;
 import entities.dbInfos.DbInfo;
 import entities.dbInfos.TableInfo;
 import entities.generatedClasses.GeneratedClass;
+import entities.generatedClasses.GeneratedClassGroup;
 import fileOperations.implementations.ConfigFileOperations;
 import fileOperations.implementations.GeneratedGeneratedClassWriter;
 import generators.implementations.EntityClassGenerator;
+import generators.implementations.RepositoryClassGenerator;
 import mappers.implementations.DbToEntityMapper;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -49,14 +51,20 @@ public class Cli implements Callable<Integer>{
 
         long generationStartTime = System.nanoTime();
         EntityClassGenerator entityClassGenerator = new EntityClassGenerator(configurations.getEntityClassGeneratorConfig());
-        List<GeneratedClass> generatedClasses = entityClassGenerator.generateJavaEntityClasses(dbInfo);
+        GeneratedClassGroup generatedEntityClassGroup = entityClassGenerator.generateJavaEntityClasses(dbInfo);
+
+        RepositoryClassGenerator repositoryClassGenerator = new RepositoryClassGenerator(configurations.getRepositoryClassGeneratorConfig(), configurations.getEntityClassGeneratorConfig());
+        GeneratedClassGroup generatedRepositoryClassGroup = repositoryClassGenerator.generateJavaRepositoryClasses(dbInfo);
+
         long generationEndTime = System.nanoTime();
-        System.out.printf("Class generation completed, %s classes generated took %s second/s%n\n", generatedClasses.size(), (generationEndTime - generationStartTime) / 1000000000);
+        System.out.printf("Class generation completed, %s classes generated took %s second/s%n\n",
+                generatedEntityClassGroup.getGeneratedClasses().size() + generatedRepositoryClassGroup.getGeneratedClasses().size(), (generationEndTime - generationStartTime) / 1000000000);
 
         System.out.println("Phase 3 started (Saving generated classes)\n");
 
         GeneratedGeneratedClassWriter generatedClassWriter = new GeneratedGeneratedClassWriter(configurations.getGeneratedClassWriterConfig());
-        generatedClassWriter.writeToFile(generatedClasses);
+        generatedClassWriter.writeToFile(generatedEntityClassGroup);
+        generatedClassWriter.writeToFile(generatedRepositoryClassGroup);
         System.out.println("Process completed");
     }
 
@@ -72,11 +80,14 @@ public class Cli implements Callable<Integer>{
         }
 
         EntityClassGenerator entityClassGenerator = new EntityClassGenerator(configurations.getEntityClassGeneratorConfig());
-        GeneratedClass generatedClass = entityClassGenerator.generateJavaEntityClass(tableInfo);
+        GeneratedClass generatedEntityClass = entityClassGenerator.generateJavaEntityClass(tableInfo);
 
+        RepositoryClassGenerator repositoryClassGenerator = new RepositoryClassGenerator(configurations.getRepositoryClassGeneratorConfig(), configurations.getEntityClassGeneratorConfig());
+        GeneratedClass generatedRepositoryClass = repositoryClassGenerator.generateJavaRepositoryClass(tableInfo);
 
         GeneratedGeneratedClassWriter generatedClassWriter = new GeneratedGeneratedClassWriter(configurations.getGeneratedClassWriterConfig());
-        generatedClassWriter.writeToConsole(generatedClass);
+        generatedClassWriter.writeToConsole(generatedEntityClass);
+        generatedClassWriter.writeToConsole(generatedRepositoryClass);
     }
 
 

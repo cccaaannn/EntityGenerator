@@ -1,14 +1,12 @@
 import connectors.implementations.Connection;
 import entities.configurations.Configurations;
 import entities.dbInfos.DbInfo;
-import entities.generatedClasses.GeneratedClass;
+import entities.generatedClasses.GeneratedClassGroup;
 import fileOperations.implementations.ConfigFileOperations;
 import fileOperations.implementations.GeneratedGeneratedClassWriter;
+import generators.implementations.RepositoryClassGenerator;
 import mappers.implementations.DbToEntityMapper;
 import generators.implementations.EntityClassGenerator;
-
-import java.util.List;
-
 
 public class Main {
 
@@ -23,12 +21,17 @@ public class Main {
         }
 
         EntityClassGenerator entityClassGenerator = new EntityClassGenerator(configurations.getEntityClassGeneratorConfig());
-        List<GeneratedClass> generatedClasses = entityClassGenerator.generateJavaEntityClasses(dbInfo);
+        GeneratedClassGroup generatedEntityClassGroup = entityClassGenerator.generateJavaEntityClasses(dbInfo);
 
+        RepositoryClassGenerator repositoryClassGenerator = new RepositoryClassGenerator(configurations.getRepositoryClassGeneratorConfig(), configurations.getEntityClassGeneratorConfig());
+        GeneratedClassGroup generatedRepositoryClassGroup = repositoryClassGenerator.generateJavaRepositoryClasses(dbInfo);
 
         GeneratedGeneratedClassWriter generatedClassWriter = new GeneratedGeneratedClassWriter(configurations.getGeneratedClassWriterConfig());
-        // entityWriter.writeToFile(generatedClasses);
-        generatedClassWriter.writeToConsole(generatedClasses);
+        generatedClassWriter.writeToConsole(generatedEntityClassGroup);
+        generatedClassWriter.writeToConsole(generatedRepositoryClassGroup);
+//        generatedClassWriter.writeToFile(generatedEntityClassGroup);
+//        generatedClassWriter.writeToFile(generatedRepositoryClassGroup);
+
 
     }
 }
