@@ -30,6 +30,10 @@ public class RepositoryClassGenerator implements IRepositoryClassGenerator {
         List<GeneratedClass> generatedRepositories = new ArrayList<>();
 
         for (TableInfo tableInfo: dbInfo.getTableInfos()) {
+            // Skip tables that does not have a primary key
+            if(repositoryClassGeneratorConfig.getSkipNonPrimaryKeyTables() && Objects.isNull(tableInfo.getPrimaryKeyColumn())) {
+                continue;
+            }
             GeneratedClass generatedRepository = generateJavaRepositoryClass(tableInfo);
             generatedRepositories.add(generatedRepository);
         }
@@ -77,12 +81,14 @@ public class RepositoryClassGenerator implements IRepositoryClassGenerator {
         // Generate extra imports if needed,
         ColumnInfo primaryKeyColumn = tableInfo.getPrimaryKeyColumn();
         boolean isExtraClassImported = false;
-        if (primaryKeyColumn.getJavaDataType().getIsImportRequired()) {
-            importsStr += "import " + primaryKeyColumn.getJavaDataType().getImportPath() + ";\n";
-            isExtraClassImported = true;
-        }
-        if (isExtraClassImported) {
-            importsStr += "\n";
+        if(Objects.nonNull(primaryKeyColumn)) {
+            if (primaryKeyColumn.getJavaDataType().getIsImportRequired()) {
+                importsStr += "import " + primaryKeyColumn.getJavaDataType().getImportPath() + ";\n";
+                isExtraClassImported = true;
+            }
+            if (isExtraClassImported) {
+                importsStr += "\n";
+            }
         }
 
         return importsStr;

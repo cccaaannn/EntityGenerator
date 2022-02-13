@@ -12,6 +12,7 @@ import utilities.StringOperations;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class EntityClassGenerator implements IEntityClassGenerator {
 
@@ -27,6 +28,10 @@ public class EntityClassGenerator implements IEntityClassGenerator {
         List<GeneratedClass> generatedEntities = new ArrayList<>();
 
         for (TableInfo tableInfo: dbInfo.getTableInfos()) {
+            // Skip tables that does not have a primary key
+            if(entityClassGeneratorConfig.getSkipNonPrimaryKeyTables() && Objects.isNull(tableInfo.getPrimaryKeyColumn())) {
+                continue;
+            }
             GeneratedClass generatedEntity = generateJavaEntityClass(tableInfo);
             generatedEntities.add(generatedEntity);
         }

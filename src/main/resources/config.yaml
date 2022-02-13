@@ -20,9 +20,11 @@ entityClassGeneratorConfig:
   addNotNullable: true
   useLombok: true
   generateGettersSetters: false
+  skipNonPrimaryKeyTables: true
 
 repositoryClassGeneratorConfig:
   packagePath: "com.can.repository"
+  skipNonPrimaryKeyTables: true
 
 generatedClassWriterConfig:
   deleteBeforeStart: true
