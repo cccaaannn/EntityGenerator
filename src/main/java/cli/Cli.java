@@ -10,29 +10,26 @@ import fileOperations.implementations.ConfigFileOperations;
 import fileOperations.implementations.GeneratedGeneratedClassWriter;
 import generators.implementations.EntityClassGenerator;
 import generators.implementations.RepositoryClassGenerator;
+import lombok.extern.slf4j.Slf4j;
 import mappers.implementations.DbToEntityMapper;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 
 
-@Command(name = "Generator", mixinStandardHelpOptions = true, version = "EntityGenerator 0.1",
-        description = "Generates Entity classes from database tables for Spring Boot applications.")
+@Slf4j
+@Command(name = "Generator", mixinStandardHelpOptions = true, version = "EntityGenerator 0.1", description = "Generates Entity classes from database tables for Spring Boot applications.")
 public class Cli implements Callable<Integer>{
-
 
     @Option(names = {"-t", "--table"}, description = "Table name to generate class")
     private String tableName = "";
 
+    private void cliAllDbOption(Configurations configurations) {
 
-
-    private void allDbOption(Configurations configurations) {
-
-        System.out.println("\nPhase 1 started (fetching metadata)\n");
+        log.info("Phase 1 started (fetching-mapping metadata)");
 
         long dbStartTime = System.nanoTime();
         DbInfo dbInfo = null;
@@ -41,13 +38,13 @@ public class Cli implements Callable<Integer>{
             dbInfo = dbToEntityMapper.mapDb();
         }
         catch (Exception e) {
-            System.out.println(e.getMessage());
+            log.error(e.getMessage());
             System.exit(0);
         }
         long dbEndTime = System.nanoTime();
-        System.out.printf("Db data fetched, took %s second/s%n\n", (dbEndTime - dbStartTime) / 1000000000);
+        log.info("Data mapped, took {} second/s", (dbEndTime - dbStartTime) / 1000000000);
 
-        System.out.println("Phase 2 started (Class generation)\n");
+        log.info("Phase 2 started (Class generation)");
 
         long generationStartTime = System.nanoTime();
         EntityClassGenerator entityClassGenerator = new EntityClassGenerator(configurations.getEntityClassGeneratorConfig());
@@ -57,25 +54,25 @@ public class Cli implements Callable<Integer>{
         GeneratedClassGroup generatedRepositoryClassGroup = repositoryClassGenerator.generateJavaRepositoryClasses(dbInfo);
 
         long generationEndTime = System.nanoTime();
-        System.out.printf("Class generation completed, %s classes generated took %s second/s%n\n",
-                generatedEntityClassGroup.getGeneratedClasses().size() + generatedRepositoryClassGroup.getGeneratedClasses().size(), (generationEndTime - generationStartTime) / 1000000000);
+        log.info("Class generation completed, {} classes generated took {} milli second/s",
+                generatedEntityClassGroup.getGeneratedClasses().size() + generatedRepositoryClassGroup.getGeneratedClasses().size(), (generationEndTime - generationStartTime) / 1000000);
 
-        System.out.println("Phase 3 started (Saving generated classes)\n");
+        log.info("Phase 3 started (Saving generated classes)");
 
         GeneratedGeneratedClassWriter generatedClassWriter = new GeneratedGeneratedClassWriter(configurations.getGeneratedClassWriterConfig());
         generatedClassWriter.writeToFile(generatedEntityClassGroup);
         generatedClassWriter.writeToFile(generatedRepositoryClassGroup);
-        System.out.println("Process completed");
+        log.info("Process completed");
     }
 
-    private void singleTableOption(Configurations configurations, String tableName) {
+    private void cliSingleTableOption(Configurations configurations, String tableName) {
         TableInfo tableInfo = null;
         try (Connection connection = new Connection(configurations.getConnectionConfig())) {
             DbToEntityMapper dbToEntityMapper = new DbToEntityMapper(connection, configurations.getDbToEntityMapperConfig());
             tableInfo = dbToEntityMapper.mapTable(tableName);
         }
         catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             System.exit(0);
         }
 
@@ -92,20 +89,20 @@ public class Cli implements Callable<Integer>{
 
 
     @Override
-    public Integer call() throws Exception {
+    public Integer call() {
 
         Configurations configurations = ConfigFileOperations.readConfig();
 
         if(Objects.isNull(configurations)) {
-            System.out.println("Can not read config file");
+            log.error("Can not read config file");
             return 0;
         }
 
         if(tableName.equals("")) {
-            allDbOption(configurations);
+            cliAllDbOption(configurations);
         }
         else{
-            singleTableOption(configurations, tableName);
+            cliSingleTableOption(configurations, tableName);
         }
 
         return 0;

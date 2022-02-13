@@ -4,6 +4,7 @@ import entities.configurations.GeneratedClassWriterConfig;
 import entities.generatedClasses.GeneratedClass;
 import entities.generatedClasses.GeneratedClassGroup;
 import fileOperations.abstracts.IGeneratedClassWriter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 
 import java.io.BufferedWriter;
@@ -11,6 +12,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+@Slf4j
 public class GeneratedGeneratedClassWriter implements IGeneratedClassWriter {
 
     private GeneratedClassWriterConfig generatedClassWriterConfig;
@@ -34,7 +36,7 @@ public class GeneratedGeneratedClassWriter implements IGeneratedClassWriter {
 
         this.createDirsIfNotExists(containingFolderName);
 
-        File file = new File(this.generatedClassWriterConfig.getOutputDir() + "/" + containingFolderName + "/" + generatedClass.getFileName());
+        File file = new File(this.generatedClassWriterConfig.getOutputDir() + File.separator + containingFolderName + File.separator + generatedClass.getFileName());
         try{
             FileWriter fw = new FileWriter(file.getAbsoluteFile());
             BufferedWriter bw = new BufferedWriter(fw);
@@ -42,7 +44,7 @@ public class GeneratedGeneratedClassWriter implements IGeneratedClassWriter {
             bw.close();
         }
         catch (IOException e){
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
     }
 
@@ -62,19 +64,19 @@ public class GeneratedGeneratedClassWriter implements IGeneratedClassWriter {
     }
 
     private void createDirsIfNotExists(String containingFolderName) {
-        File directory = new File(this.generatedClassWriterConfig.getOutputDir() + "/" + containingFolderName);
+        File directory = new File(this.generatedClassWriterConfig.getOutputDir() + File.separator + containingFolderName);
         if (!directory.exists()){
             directory.mkdirs();
         }
     }
 
     private void deleteDirIfNotExists(String containingFolderName) {
-        File directory = new File(this.generatedClassWriterConfig.getOutputDir() + "/" + containingFolderName);
+        File directory = new File(this.generatedClassWriterConfig.getOutputDir() + File.separator + containingFolderName);
         if (directory.exists()){
             try {
                 FileUtils.deleteDirectory(new File(generatedClassWriterConfig.getOutputDir()));
             } catch (IOException e) {
-                // e.printStackTrace();
+                log.error(e.getMessage());
             }
         }
     }

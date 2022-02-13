@@ -8,6 +8,7 @@ public interface IConnection {
     void connect();
     void disconnect();
     void closeResultSet(ResultSet resultSet);
+    Integer getResultSetSize(ResultSet resultSet);
     DatabaseMetaData getDbMetadata();
     ResultSetMetaData getTableMetadata(String tableName);
     String getPrimaryKey(String tableName);

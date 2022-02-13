@@ -4,12 +4,11 @@ import entities.dbInfos.DbInfo;
 import entities.generatedClasses.GeneratedClassGroup;
 import fileOperations.implementations.ConfigFileOperations;
 import fileOperations.implementations.GeneratedGeneratedClassWriter;
+import generators.implementations.EntityClassGenerator;
 import generators.implementations.RepositoryClassGenerator;
 import mappers.implementations.DbToEntityMapper;
-import generators.implementations.EntityClassGenerator;
 
 public class Main {
-
     public static void main(String[] args) {
 
         Configurations configurations = ConfigFileOperations.readConfig();
@@ -18,6 +17,9 @@ public class Main {
         try (Connection connection = new Connection(configurations.getConnectionConfig())) {
             DbToEntityMapper dbToEntityMapper = new DbToEntityMapper(connection, configurations.getDbToEntityMapperConfig());
             dbInfo = dbToEntityMapper.mapDb();
+        }
+        catch (Exception e) {
+            System.exit(0);
         }
 
         EntityClassGenerator entityClassGenerator = new EntityClassGenerator(configurations.getEntityClassGeneratorConfig());
@@ -31,7 +33,6 @@ public class Main {
         generatedClassWriter.writeToConsole(generatedRepositoryClassGroup);
 //        generatedClassWriter.writeToFile(generatedEntityClassGroup);
 //        generatedClassWriter.writeToFile(generatedRepositoryClassGroup);
-
 
     }
 }

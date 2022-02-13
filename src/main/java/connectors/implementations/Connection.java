@@ -2,9 +2,11 @@ package connectors.implementations;
 
 import connectors.abstracts.IConnection;
 import entities.configurations.ConnectionConfig;
+import lombok.extern.slf4j.Slf4j;
 
 import java.sql.*;
 
+@Slf4j
 public class Connection implements IConnection, AutoCloseable {
 
     private java.sql.Connection conn = null;
@@ -27,9 +29,10 @@ public class Connection implements IConnection, AutoCloseable {
     public void connect() {
         try {
             this.conn = DriverManager.getConnection(this.connectionConfig.getConnectionString());
+            log.debug("Connected\n");
         }
         catch (Exception e) {
-            System.err.println(e);
+            log.error(e.getMessage());
         }
     }
 
@@ -37,10 +40,10 @@ public class Connection implements IConnection, AutoCloseable {
     public void disconnect() {
         try {
             conn.close();
-//            System.out.println("--- dc ---\n");
+            log.debug("Disconnected\n");
         }
         catch (Exception e){
-            System.err.println(e);
+            log.error(e.getMessage());
         }
     }
 
@@ -48,10 +51,26 @@ public class Connection implements IConnection, AutoCloseable {
     public void closeResultSet(ResultSet resultSet) {
         try {
             resultSet.close();
+            log.debug("ResultSet closed\n");
         }
         catch (Exception e) {
-
+            log.debug("Can not closed ResultSet\n");
         }
+    }
+
+    @Override
+    public Integer getResultSetSize(ResultSet resultSet) {
+        int counter = 0;
+        try {
+            while (resultSet.next()) {
+                counter++;
+            }
+            resultSet.beforeFirst();
+        }
+        catch (Exception e) {
+            log.debug("Can not get ResultSet size\n");
+        }
+        return counter;
     }
 
     @Override
@@ -62,7 +81,7 @@ public class Connection implements IConnection, AutoCloseable {
             return databaseMetaData;
         }
         catch (Exception e){
-            System.out.println(e);
+            log.error(e.getMessage());
         }
         return null;
     }
@@ -75,7 +94,7 @@ public class Connection implements IConnection, AutoCloseable {
             return st.executeQuery(query).getMetaData();
         }
         catch (Exception e){
-            System.err.println(e);
+            log.error(e.getMessage());
         }
         return null;
     }
@@ -91,8 +110,8 @@ public class Connection implements IConnection, AutoCloseable {
                 primaryKey = resultSet.getString("COLUMN_NAME");
             }
         }
-        catch (SQLException throwables) {
-            throwables.printStackTrace();
+        catch (SQLException e) {
+            log.error(e.getMessage());
         }
         finally {
             this.closeResultSet(resultSet);

@@ -6,6 +6,7 @@ import entities.dbInfos.ColumnInfo;
 import entities.dbInfos.DbInfo;
 import entities.dbInfos.TableInfo;
 import entities.configurations.DbToEntityMapperConfig;
+import lombok.extern.slf4j.Slf4j;
 import mappers.abstracts.IDbToEntityMapper;
 import utilities.StringOperations;
 
@@ -17,6 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@Slf4j
 public class DbToEntityMapper implements IDbToEntityMapper {
 
     private IConnection connection;
@@ -86,7 +88,7 @@ public class DbToEntityMapper implements IDbToEntityMapper {
             tableInfo.setColumnInfos(columnInfos);
         }
         catch (Exception e){
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
 
         return tableInfo;
@@ -105,21 +107,30 @@ public class DbToEntityMapper implements IDbToEntityMapper {
         List<TableInfo> tableInfos = new ArrayList<>();
         try {
             resultSet = metadata.getTables(dbToEntityMapperConfig.getCatalog(), null, null, new String[]{"TABLE"});
+            Integer resultSetSize = this.connection.getResultSetSize(resultSet);
+
+            int currentResult = 1;
             while(resultSet.next()){
                 String tableName = resultSet.getString("TABLE_NAME");
-                System.out.printf("Table: %s\n", tableName);
+                log.info("Table{}/{}: {}", currentResult, resultSetSize, tableName);
+
                 // pass ignored tables
-                if(dbToEntityMapperConfig.getTablesToIgnore().contains(tableName)){ continue;}
+                if(dbToEntityMapperConfig.getTablesToIgnore().contains(tableName)){
+                    log.info("Ignored");
+                    continue;
+                }
 
                 // add table info
                 TableInfo tableInfo = this.mapTable(tableName);
                 tableInfos.add(tableInfo);
+
+                currentResult++;
             }
 
             dbInfo.setTableInfos(tableInfos);
         }
         catch (Exception e){
-            System.err.println(e);
+            log.error(e.getMessage());
         }
         // Try to close result set
         finally {
