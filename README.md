@@ -1,5 +1,5 @@
 # EntityGenerator
-Generates Entity classes from database tables for Spring Boot applications.
+Generates Entity classes from database tables for Spring Boot projects.
 ---
 
 <br/>
@@ -10,10 +10,10 @@ Generates Entity classes from database tables for Spring Boot applications.
 
 2. Run for a single table (prints to console)
 ```shell
-java -jar EntityGenerator-1.0.jar
+java -jar EntityGenerator-1.0.jar -t <tableName>
 ```
 
 2. Run for all db (saves to file)
 ```shell
-java -jar EntityGenerator-1.0.jar -t <tableName>
+java -jar EntityGenerator-1.0.jar
 ```
