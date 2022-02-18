@@ -19,7 +19,7 @@ entityClassGeneratorConfig:
   generatedValueStrategy: "GenerationType.IDENTITY"
   addNotNullable: true
   useLombok: true
-  generateGettersSetters: false
+  generateConstructorsGettersSetters: false
   skipNonPrimaryKeyTables: true
 
 repositoryClassGeneratorConfig:

@@ -8,6 +8,7 @@ public class ColumnInfo {
     private Integer columnPosition;
     private String columnNameSql;
     private String columnNameJava;
+    private String columnNameJavaFunction;
 
     private String sqlDataType;
     private JavaDataType javaDataType;
@@ -21,6 +22,10 @@ public class ColumnInfo {
      */
     public void setColumnNameJava(String columnNameJava) {
         this.columnNameJava = StringOperations.toCamelCase(columnNameJava);
+    }
+
+    public void setColumnNameJavaFunction(String columnNameJavaFunction) {
+        this.columnNameJavaFunction = StringOperations.toCapitalCamelCase(columnNameJavaFunction);
     }
 
     /*

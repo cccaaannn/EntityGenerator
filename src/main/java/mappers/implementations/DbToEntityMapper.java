@@ -71,6 +71,7 @@ public class DbToEntityMapper implements IDbToEntityMapper {
                 columnInfo.setColumnPosition(i);
                 columnInfo.setColumnNameSql(resultSetMetaData.getColumnName(i));
                 columnInfo.setColumnNameJava(resultSetMetaData.getColumnName(i));
+                columnInfo.setColumnNameJavaFunction(resultSetMetaData.getColumnName(i));
 
                 columnInfo.setSqlDataType(resultSetMetaData.getColumnTypeName(i));
 

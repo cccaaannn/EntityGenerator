@@ -57,9 +57,6 @@ public class EntityClassGenerator implements IEntityClassGenerator {
         generatedClassStr += generateImports(tableInfo);
         generatedClassStr += generateClassAnnotations(tableInfo);
         generatedClassStr += generateEntities(tableInfo);
-        if(this.entityClassGeneratorConfig.getGenerateGettersSetters()) {
-            generatedClassStr += generateGettersSetters(tableInfo);
-        }
 
         generatedClass.setGeneratedClassStr(generatedClassStr);
 
@@ -149,14 +146,66 @@ public class EntityClassGenerator implements IEntityClassGenerator {
 
             classStr += "\tprivate " + columnInfo.getJavaDataType().getName() + " " + columnInfo.getColumnNameJava() + ";";
             classStr += "\n\n";
+
         }
+
+        if(entityClassGeneratorConfig.getGenerateConstructorsGettersSetters()){
+            classStr += "\n\t// ---------- Constructors ----------\n";
+            classStr += generateAllArgsConstructor(tableInfo);
+            classStr += generateNoArgsConstructor(tableInfo);
+
+            classStr += "\n\t// ---------- Getter - Setter ----------\n";
+            for (ColumnInfo columnInfo : tableInfo.getColumnInfos()) {
+                classStr += generateGetter(columnInfo);
+                classStr += generateSetter(columnInfo);
+            }
+        }
+
         classStr += "}\n";
 
         return classStr;
     }
 
-    private String generateGettersSetters(TableInfo tableInfo) {
-        return null;
+    private String generateAllArgsConstructor(TableInfo tableInfo) {
+        String constructorStr = "";
+        constructorStr += "\n\tpublic " + tableInfo.getNameJava() + "(";
+        for (int i = 0; i < tableInfo.getColumnInfos().size(); i++) {
+            constructorStr += tableInfo.getColumnInfos().get(i).getJavaDataType().getName() + " " + tableInfo.getColumnInfos().get(i).getColumnNameJava();
+            if(i != tableInfo.getColumnInfos().size() - 1) {
+                constructorStr += ", ";
+            }
+        }
+        constructorStr += ") {\n";
+        for (ColumnInfo columnInfo : tableInfo.getColumnInfos()) {
+            constructorStr += "\t\tthis." + columnInfo.getColumnNameJava() + " = " + columnInfo.getColumnNameJava() + ";\n";
+        }
+        constructorStr += "\t}\n";
+
+        return constructorStr;
+    }
+
+    private String generateNoArgsConstructor(TableInfo tableInfo) {
+        String constructorStr = "";
+        constructorStr += "\n\tpublic " + tableInfo.getNameJava() + "() { }\n";
+        return constructorStr;
+    }
+
+    private String generateGetter(ColumnInfo columnInfo) {
+        String getterStr = "";
+        getterStr += "\n\tpublic " + columnInfo.getJavaDataType().getName() + " get" + columnInfo.getColumnNameJavaFunction() + "() {\n";
+        getterStr += "\t\treturn " + columnInfo.getColumnNameJava() + ";\n";
+        getterStr += "\t}\n";
+
+        return getterStr;
+    }
+
+    private String generateSetter(ColumnInfo columnInfo) {
+        String setterStr = "";
+        setterStr += "\n\tpublic void set" + columnInfo.getColumnNameJavaFunction() + "(" + columnInfo.getJavaDataType().getName() + " " + columnInfo.getColumnNameJava() + ") {\n";
+        setterStr += "\t\tthis." + columnInfo.getColumnNameJava() + " = " + columnInfo.getColumnNameJava() + ";\n";
+        setterStr += "\t}\n";
+
+        return setterStr;
     }
 
 }

@@ -8,6 +8,6 @@ public class EntityClassGeneratorConfig {
     private String generatedValueStrategy;
     private Boolean addNotNullable;
     private Boolean useLombok;
-    private Boolean generateGettersSetters;
+    private Boolean generateConstructorsGettersSetters;
     private Boolean skipNonPrimaryKeyTables;
 }
